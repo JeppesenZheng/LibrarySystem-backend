@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import src.User.BookAdmin;
+import src.User.NormalUser;
+import src.User.SystemAdmin;
+import src.User.User;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -19,6 +24,33 @@ public class UserController {
     public User createUser(@RequestBody User user) {
         try {
             return userService.createUser(user.getName(), user.getEmail());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/createSystemAdmin")
+    public SystemAdmin createSystemAdmin(@RequestBody User user) {
+        try {
+            return userService.createSystemAdmin(user.getName(), user.getEmail());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/createBookAdmin")
+    public BookAdmin createBookAdmin(@RequestBody User user) {
+        try {
+            return userService.createBookAdmin(user.getName(), user.getEmail());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/createNormalUser")
+    public NormalUser createOtherUser(@RequestBody User user) {
+        try {
+            return userService.createNormalUser(user.getName(), user.getEmail());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
