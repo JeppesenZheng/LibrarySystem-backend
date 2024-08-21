@@ -61,7 +61,7 @@ public class UserController {
         }
     }
 
-   @PostMapping("/login")
+    @PostMapping("/login")
     public String login(@RequestParam String name, @RequestParam String password) {
         boolean isAuthenticated = userService.authenticate(name, password);
         if (isAuthenticated) {
