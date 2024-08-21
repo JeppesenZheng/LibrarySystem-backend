@@ -2,8 +2,9 @@ package src.User;
 
 public class NormalUser extends User {
 
-    public NormalUser(Long id, String name, String email) {
-        super(id, name, email);
+    public NormalUser(String name, String password) {
+        super(name, password);
+        //TODO Auto-generated constructor stub
     }
-    
+
 }

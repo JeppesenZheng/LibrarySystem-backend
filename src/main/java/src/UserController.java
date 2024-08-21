@@ -1,10 +1,13 @@
 package src;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -22,8 +25,9 @@ public class UserController {
 
     @PostMapping("/create")
     public User createUser(@RequestBody User user) {
+        System.out.println("try to create User class");
         try {
-            return userService.createUser(user.getName(), user.getEmail());
+            return userService.createUser(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -31,8 +35,9 @@ public class UserController {
 
     @PostMapping("/createSystemAdmin")
     public SystemAdmin createSystemAdmin(@RequestBody User user) {
+        System.out.println("try to create admin user");
         try {
-            return userService.createSystemAdmin(user.getName(), user.getEmail());
+            return userService.createSystemAdmin(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -41,7 +46,7 @@ public class UserController {
     @PostMapping("/createBookAdmin")
     public BookAdmin createBookAdmin(@RequestBody User user) {
         try {
-            return userService.createBookAdmin(user.getName(), user.getEmail());
+            return userService.createBookAdmin(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -50,9 +55,22 @@ public class UserController {
     @PostMapping("/createNormalUser")
     public NormalUser createOtherUser(@RequestBody User user) {
         try {
-            return userService.createNormalUser(user.getName(), user.getEmail());
+            return userService.createNormalUser(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+   @PostMapping("/login")
+    public String login(@RequestParam String name, @RequestParam String password) {
+        boolean isAuthenticated = userService.authenticate(name, password);
+        if (isAuthenticated) {
+            // Generate a new UUID
+            String sessionId = UUID.randomUUID().toString();
+            System.out.println("sessionId is " + sessionId);
+            return sessionId;
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication failed");
         }
     }
 }

@@ -1,26 +1,17 @@
 package src.User;
 
 public class User {
-    private Long id;
     private String name;
-    private String email;
+    private String password;
 
     // Constructors
 
-    public User(Long id, String name, String email) {
-        this.id = id;
+    public User(String name, String password) {
         this.name = name;
-        this.email = email;
+        this.password = password;
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -30,11 +21,11 @@ public class User {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getPassword() {
+        return password;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

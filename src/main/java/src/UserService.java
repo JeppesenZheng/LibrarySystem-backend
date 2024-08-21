@@ -12,45 +12,47 @@ import src.User.User;
 
 @Service
 public class UserService {
-    private Map<Long, User> users = new HashMap<>();
-    private Long currentId = 1L;
+    private Map<String, User> users = new HashMap<>();
 
-    public User createUser(String name, String email) {
-        checkUserExists(name, email);
-        User user = new User(currentId++, name, email);
-        users.put(user.getId(), user);
+    public User createUser(String name, String password) {
+        checkUserExists(name, password);
+        User user = new User(name, password);
+        users.put(user.getName(), user);
         return user;
     }
 
-    public SystemAdmin createSystemAdmin(String name, String email) {
-        checkUserExists(name, email);
-        SystemAdmin admin = new SystemAdmin(currentId++, name, email);
-        users.put(admin.getId(), admin);
+    public SystemAdmin createSystemAdmin(String name, String password) {
+        checkUserExists(name, password);
+        SystemAdmin admin = new SystemAdmin(name, password);
+        users.put(admin.getName(), admin);
         return admin;
     }
 
-    public BookAdmin createBookAdmin(String name, String email) {
-        checkUserExists(name, email);
-        BookAdmin admin = new BookAdmin(currentId++, name, email);
-        users.put(admin.getId(), admin);
+    public BookAdmin createBookAdmin(String name, String password) {
+        checkUserExists(name, password);
+        BookAdmin admin = new BookAdmin(name, password);
+        users.put(admin.getName(), admin);
         return admin;
     }
 
-    public NormalUser createNormalUser(String name, String email) {
-        checkUserExists(name, email);
-        NormalUser normalUser = new NormalUser(currentId++, name, email);
-        users.put(normalUser.getId(), normalUser);
+    public NormalUser createNormalUser(String name, String password) {
+        checkUserExists(name, password);
+        NormalUser normalUser = new NormalUser(name, password);
+        users.put(normalUser.getName(), normalUser);
         return normalUser;
     }
 
     private void checkUserExists(String name, String email) {
-        for (User existingUser : users.values()) {
-            if (existingUser.getName().equals(name)) {
-                throw new IllegalArgumentException("User with the same name already exists.");
-            }
-            if (existingUser.getEmail().equals(email)) {
-                throw new IllegalArgumentException("User with the same email already exists.");
-            }
+        if (users.containsKey(name)) {
+            throw new IllegalArgumentException("User with the same name already exists.");
         }
+    }
+
+    public boolean authenticate(String name, String password) {
+        User user = users.get(name);
+        if (user != null && user.getPassword().equals(password)) {
+            return true;
+        }
+        return false;
     }
 }
