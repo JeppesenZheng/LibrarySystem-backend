@@ -1,7 +1,5 @@
 package src;
 
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,12 +61,9 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(@RequestParam String name, @RequestParam String password) {
-        boolean isAuthenticated = userService.authenticate(name, password);
-        if (isAuthenticated) {
-            // Generate a new UUID
-            String sessionId = UUID.randomUUID().toString();
-            System.out.println("sessionId is " + sessionId);
-            return sessionId;
+        String token = userService.authenticate(name, password);
+        if (token != null) {
+            return token;
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication failed");
         }

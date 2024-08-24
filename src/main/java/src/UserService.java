@@ -2,6 +2,7 @@ package src;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import src.User.User;
 @Service
 public class UserService {
     private Map<String, User> users = new HashMap<>();
+    private Map<String, User> tokens = new HashMap<>();
 
     public User createUser(String name, String password) {
         checkUserExists(name, password);
@@ -48,11 +50,14 @@ public class UserService {
         }
     }
 
-    public boolean authenticate(String name, String password) {
+    public String authenticate(String name, String password) {
+        System.out.println("users are " + users);
         User user = users.get(name);
         if (user != null && user.getPassword().equals(password)) {
-            return true;
+            String sessionId = UUID.randomUUID().toString();
+            tokens.put(sessionId, user);
+            return sessionId;
         }
-        return false;
+        return null;
     }
 }
