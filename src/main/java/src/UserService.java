@@ -16,13 +16,13 @@ public class UserService {
     private Map<String, User> users = new HashMap<>();
     private Map<String, User> tokens = new HashMap<>();
 
-    public User createUser(String name, String password) {
-        checkUserExists(name, password);
-        User user = new User(name, password);
-        users.put(user.getName(), user);
-        return user;
-    }
-
+    // public User createUser(String name, String password) {
+    //     checkUserExists(name, password);
+    //     User user = new User(name, password);
+    //     users.put(user.getName(), user);
+    //     return user;
+    // }
+    // I love jiamingzhang
     public SystemAdmin createSystemAdmin(String name, String password) {
         checkUserExists(name, password);
         SystemAdmin admin = new SystemAdmin(name, password);

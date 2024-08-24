@@ -21,15 +21,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/create")
-    public User createUser(@RequestBody User user) {
-        System.out.println("try to create User class");
-        try {
-            return userService.createUser(user.getName(), user.getPassword());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
+    // @PostMapping("/create")
+    // public User createUser(@RequestBody User user) {
+    //     System.out.println("try to create User class");
+    //     try {
+    //         return userService.createUser(user.getName(), user.getPassword());
+    //     } catch (IllegalArgumentException e) {
+    //         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    //     }
+    // }
 
     @PostMapping("/createSystemAdmin")
     public SystemAdmin createSystemAdmin(@RequestBody User user) {
@@ -60,6 +60,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
+    // example of testing in Client API 
+    // http://localhost:8080/users/login?name=user1&password=1111
     public String login(@RequestParam String name, @RequestParam String password) {
         String token = userService.authenticate(name, password);
         if (token != null) {
