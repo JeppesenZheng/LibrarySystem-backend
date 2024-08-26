@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,17 +21,19 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/create")
-    public User createUser(@RequestBody User user) {
-        try {
-            return userService.createUser(user.getName(), user.getPassword());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
+    // @PostMapping("/create")
+    // public User createUser(@RequestBody User user) {
+    //     System.out.println("try to create User class");
+    //     try {
+    //         return userService.createUser(user.getName(), user.getPassword());
+    //     } catch (IllegalArgumentException e) {
+    //         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    //     }
+    // }
 
     @PostMapping("/createSystemAdmin")
     public SystemAdmin createSystemAdmin(@RequestBody User user) {
+        System.out.println("try to create admin user");
         try {
             return userService.createSystemAdmin(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
@@ -53,6 +56,18 @@ public class UserController {
             return userService.createNormalUser(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/login")
+    // example of testing in Client API 
+    // http://localhost:8080/users/login?name=user1&password=1111
+    public String login(@RequestParam String name, @RequestParam String password) {
+        String token = userService.authenticate(name, password);
+        if (token != null) {
+            return token;
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication failed");
         }
     }
 }
