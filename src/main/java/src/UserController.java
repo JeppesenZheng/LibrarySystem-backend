@@ -23,7 +23,7 @@ public class UserController {
     @PostMapping("/create")
     public User createUser(@RequestBody User user) {
         try {
-            return userService.createUser(user.getName(), user.getEmail());
+            return userService.createUser(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -32,7 +32,7 @@ public class UserController {
     @PostMapping("/createSystemAdmin")
     public SystemAdmin createSystemAdmin(@RequestBody User user) {
         try {
-            return userService.createSystemAdmin(user.getName(), user.getEmail());
+            return userService.createSystemAdmin(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -41,7 +41,7 @@ public class UserController {
     @PostMapping("/createBookAdmin")
     public BookAdmin createBookAdmin(@RequestBody User user) {
         try {
-            return userService.createBookAdmin(user.getName(), user.getEmail());
+            return userService.createBookAdmin(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -50,7 +50,7 @@ public class UserController {
     @PostMapping("/createNormalUser")
     public NormalUser createOtherUser(@RequestBody User user) {
         try {
-            return userService.createNormalUser(user.getName(), user.getEmail());
+            return userService.createNormalUser(user.getName(), user.getPassword());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

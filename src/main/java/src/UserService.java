@@ -15,41 +15,41 @@ public class UserService {
     private Map<Long, User> users = new HashMap<>();
     private Long currentId = 1L;
 
-    public User createUser(String name, String email) {
-        checkUserExists(name, email);
-        User user = new User(currentId++, name, email);
+    public User createUser(String name, String password) {
+        checkUserExists(name, password);
+        User user = new User(currentId++, name, password);
         users.put(user.getId(), user);
         return user;
     }
 
-    public SystemAdmin createSystemAdmin(String name, String email) {
-        checkUserExists(name, email);
-        SystemAdmin admin = new SystemAdmin(currentId++, name, email);
+    public SystemAdmin createSystemAdmin(String name, String password) {
+        checkUserExists(name, password);
+        SystemAdmin admin = new SystemAdmin(currentId++, name, password);
         users.put(admin.getId(), admin);
         return admin;
     }
 
-    public BookAdmin createBookAdmin(String name, String email) {
-        checkUserExists(name, email);
-        BookAdmin admin = new BookAdmin(currentId++, name, email);
+    public BookAdmin createBookAdmin(String name, String password) {
+        checkUserExists(name, password);
+        BookAdmin admin = new BookAdmin(currentId++, name, password);
         users.put(admin.getId(), admin);
         return admin;
     }
 
-    public NormalUser createNormalUser(String name, String email) {
-        checkUserExists(name, email);
-        NormalUser normalUser = new NormalUser(currentId++, name, email);
+    public NormalUser createNormalUser(String name, String password) {
+        checkUserExists(name, password);
+        NormalUser normalUser = new NormalUser(currentId++, name, password);
         users.put(normalUser.getId(), normalUser);
         return normalUser;
     }
 
-    private void checkUserExists(String name, String email) {
+    private void checkUserExists(String name, String password) {
         for (User existingUser : users.values()) {
             if (existingUser.getName().equals(name)) {
                 throw new IllegalArgumentException("User with the same name already exists.");
             }
-            if (existingUser.getEmail().equals(email)) {
-                throw new IllegalArgumentException("User with the same email already exists.");
+            if (existingUser.getPassword().equals(password)) {
+                throw new IllegalArgumentException("User with the same password already exists.");
             }
         }
     }
