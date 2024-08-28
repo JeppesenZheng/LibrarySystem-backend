@@ -1,11 +1,14 @@
 package src;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import src.Book.Book;
 import src.User.BookAdmin;
 import src.User.NormalUser;
 import src.User.SystemAdmin;
@@ -15,14 +18,8 @@ import src.User.User;
 public class UserService {
     private Map<String, User> users = new HashMap<>();
     private Map<String, User> tokens = new HashMap<>();
+    private Map<String, Book> books = new HashMap<>();
 
-    // public User createUser(String name, String password) {
-    //     checkUserExists(name, password);
-    //     User user = new User(name, password);
-    //     users.put(user.getName(), user);
-    //     return user;
-    // }
-    // I love jiamingzhang
     public SystemAdmin createSystemAdmin(String name, String password) {
         checkUserExists(name, password);
         SystemAdmin admin = new SystemAdmin(name, password);
@@ -59,5 +56,27 @@ public class UserService {
             return sessionId;
         }
         return null;
+    }
+
+    // add new book
+    public void addBook(Book book) {
+        books.put(book.getISBN(), book);
+    }
+
+    public List<Book> getAllBooks() {
+        System.out.println("books are " + books);
+        return new ArrayList<>(books.values());
+    }
+
+    public Book getBookByISBN(String isbn) {
+        return books.get(isbn);
+    }
+    
+    public void updateBook(Book book) {
+        books.put(book.getISBN(), book);
+    }
+
+    public void deleteBook(String isbn) {
+        books.remove(isbn);
     }
 }
