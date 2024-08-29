@@ -43,19 +43,16 @@ public class BookController {
     }
 
     @PostMapping("/borrow/{isbn}")
-    public ResponseEntity<?> borrowBook(@PathVariable String isbn, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> borrowBook(@PathVariable String isbn, @RequestBody Map<String, Integer> payload, @RequestHeader("Authorization") String token) {
         try {
-            System.out.println("Received borrow request for ISBN: " + isbn);
             String username = userService.getUsernameFromToken(token.replace("Bearer ", ""));
-            System.out.println("Username from token: " + username);
             if (username == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("无效的 token");
             }
-            userService.borrowBook(username, isbn);
+            int days = payload.get("days");
+            userService.borrowBook(username, isbn, days);
             return ResponseEntity.ok().body("借阅成功");
         } catch (Exception e) {
-            System.err.println("借阅失败: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -1,5 +1,7 @@
 package src.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +14,8 @@ public class Book {
     private String author;
     private String isbn;
     private boolean borrowed;
+    private LocalDate borrowDate;
+    private int borrowDays;
 
     public Book() { }
 
@@ -57,5 +61,22 @@ public class Book {
     public Long getId() {
         return id;
     }
+
+    public LocalDate getBorrowDate() {
+        return borrowDate;
+    }
+
+    public void setBorrowDate(LocalDate borrowDate) {
+        this.borrowDate = borrowDate;
+    }
+
+    public int getBorrowDays() {
+        return borrowDays;
+    }
+
+    public void setBorrowDays(int borrowDays) {
+        this.borrowDays = borrowDays;
+    }
+
 
 }

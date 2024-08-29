@@ -2,6 +2,7 @@ package src.service;
 
 import java.util.ArrayList;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,8 @@ import java.util.Optional;
 // import java.nio.charset.StandardCharsets;
 
 import javax.crypto.SecretKey;
+
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class UserService {
@@ -139,12 +142,14 @@ public class UserService {
         return userRepository.findByName(name).orElse(null);
     }
 
-    public void borrowBook(String username, String isbn) throws Exception {
+    public void borrowBook(String username, String isbn, int days) throws Exception {
         User user = getUserByName(username);
         Book book = getBookByISBN(isbn);
         if (user instanceof NormalUser && book != null && !book.isBorrowed()) {
             ((NormalUser) user).borrowBook(book);
             book.setBorrowed(true);
+            book.setBorrowDate(LocalDate.now());
+            book.setBorrowDays(days);
             updateBook(book);
         } else {
             throw new Exception("无法借阅该书");
@@ -200,6 +205,13 @@ public class UserService {
             if (book.isBorrowed()) {
                 String borrowerName = findBorrowerName(book);
                 bookInfo.put("borrowerName", borrowerName);
+                bookInfo.put("borrowDate", book.getBorrowDate().toString());
+                bookInfo.put("borrowDays", book.getBorrowDays());
+                
+                // 计算剩余天数
+                LocalDate dueDate = book.getBorrowDate().plusDays(book.getBorrowDays());
+                long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), dueDate);
+                bookInfo.put("daysLeft", daysLeft);
             }
 
             booksWithStatus.add(bookInfo);
