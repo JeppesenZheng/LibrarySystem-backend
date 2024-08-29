@@ -1,8 +1,11 @@
-package src;
+package src.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import src.Book.Book;
+
+import src.model.Book;
+import src.service.UserService;
+
 import java.util.List;
 
 @RestController

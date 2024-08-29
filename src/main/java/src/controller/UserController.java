@@ -1,7 +1,8 @@
-package src;
+package src.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 import src.User.BookAdmin;
 import src.User.NormalUser;
 import src.User.SystemAdmin;
-import src.User.User;
+import src.model.User;
+import src.service.UserService;
 
 @RestController
 @RequestMapping("/users")
@@ -51,11 +53,15 @@ public class UserController {
     }
 
     @PostMapping("/createNormalUser")
-    public NormalUser createOtherUser(@RequestBody User user) {
+    public ResponseEntity<?> createOtherUser(@RequestBody NormalUser user) {
         try {
-            return userService.createNormalUser(user.getName(), user.getPassword());
+            NormalUser normalUser = userService.createNormalUser(user.getName(), user.getPassword());
+            return ResponseEntity.ok(normalUser);
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
         }
     }
 

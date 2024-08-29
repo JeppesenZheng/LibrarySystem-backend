@@ -1,14 +1,23 @@
-package src.Book;
+package src.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "books")
 public class Book {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String title;
     private String author;
-    private String ISBN;
+    private String isbn;
 
-    public Book(String title, String author, String ISBN) {
+    public Book() { }
+
+    public Book(String title, String author, String isbn) {
         this.title = title;
         this.author = author;
-        this.ISBN = ISBN;
+        this.isbn = isbn;
     }
 
     public String getTitle() {
@@ -20,7 +29,7 @@ public class Book {
     }
 
     public String getISBN() {
-        return ISBN;
+        return isbn;
     }
 
     public void setTitle(String title) {
@@ -31,8 +40,8 @@ public class Book {
         this.author = author;
     }
 
-    public void setISBN(String ISBN) {
-        this.ISBN = ISBN;
+    public void setISBN(String isbn) {
+        this.isbn = isbn;
     }
 
 }
