@@ -1,16 +1,19 @@
 package src.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -85,6 +88,24 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("登录时发生错误：" + e.getMessage());
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUsers(@RequestHeader("Authorization") String token) {
+        try {
+            String username = userService.getUsernameFromToken(token.replace("Bearer ", ""));
+            if (username == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("无效的 token");
+            }
+            User user = userService.getUserByName(username);
+            if (!(user instanceof SystemAdmin)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("没有权限访问此资源");
+            }
+            List<Map<String, Object>> allUsers = userService.getAllUsers();
+            return ResponseEntity.ok(allUsers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("获取用户列表失败: " + e.getMessage());
         }
     }
 

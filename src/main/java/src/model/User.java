@@ -37,6 +37,9 @@ public abstract class User {
     }
 
     // Getters and Setters
+    public Long getId() {
+        return id;
+    }
 
     public String getName() {
         return name;

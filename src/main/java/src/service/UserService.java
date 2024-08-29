@@ -229,4 +229,27 @@ public class UserService {
         }
         return null;
     }
+
+    public List<Map<String, Object>> getAllUsers() {
+        List<User> allUsers = userRepository.findAll();
+        List<Map<String, Object>> usersInfo = new ArrayList<>();
+
+        for (User user : allUsers) {
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("id", user.getId());
+            userInfo.put("name", user.getName());
+            userInfo.put("userType", getUserType(user));
+            userInfo.put("password", user.getPassword());
+            usersInfo.add(userInfo);
+        }
+
+        return usersInfo;
+    }
+
+    private String getUserType(User user) {
+        if (user instanceof NormalUser) return "normal";
+        if (user instanceof BookAdmin) return "bookAdmin";
+        if (user instanceof SystemAdmin) return "systemAdmin";
+        return "unknown";
+    }
 }
