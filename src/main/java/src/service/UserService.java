@@ -1,11 +1,22 @@
 package src.service;
 
+import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+// import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.Claims;
+// import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
 import src.User.BookAdmin;
 import src.User.NormalUser;
@@ -15,6 +26,9 @@ import src.model.User;
 import src.repository.BookRepository;
 import src.repository.UserRepository;
 import java.util.Optional;
+// import java.nio.charset.StandardCharsets;
+
+import javax.crypto.SecretKey;
 
 @Service
 public class UserService {
@@ -26,6 +40,16 @@ public class UserService {
 
     @Autowired
     private BookRepository bookRepository;
+
+    // private Map<String, String> tokenToUsername = new HashMap<>();
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public SystemAdmin createSystemAdmin(String name, String password) {
         checkUserExists(name, password);
@@ -71,9 +95,23 @@ public class UserService {
         }
     }
 
-    public String authenticate(String name, String password) {
-        Optional<User> user = userRepository.findByName(name);
-        return user.isPresent() && user.get().getPassword().equals(password) ? UUID.randomUUID().toString() : null;
+    public String authenticate(String username, String password) {
+        // 验证用户名和密码
+        User user = getUserByName(username);
+        if (user != null && user.getPassword().equals(password)) {
+            return generateToken(username);
+        }
+        return null;
+    }
+
+    private String generateToken(String username) {
+        long expirationTime = 1000 * 60 * 60 * 24; // 24小时
+        return Jwts.builder()
+            .setSubject(username)
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
     }
 
     // add new book
@@ -99,5 +137,84 @@ public class UserService {
 
     public User getUserByName(String name) {
         return userRepository.findByName(name).orElse(null);
+    }
+
+    public void borrowBook(String username, String isbn) throws Exception {
+        User user = getUserByName(username);
+        Book book = getBookByISBN(isbn);
+        if (user instanceof NormalUser && book != null && !book.isBorrowed()) {
+            ((NormalUser) user).borrowBook(book);
+            book.setBorrowed(true);
+            updateBook(book);
+        } else {
+            throw new Exception("无法借阅该书");
+        }
+    }
+
+    public void returnBook(String username, String isbn) throws Exception {
+        User user = getUserByName(username);
+        Book book = getBookByISBN(isbn);
+        if (user instanceof NormalUser && book != null && book.isBorrowed()) {
+            ((NormalUser) user).returnBook(book);
+            book.setBorrowed(false);
+            updateBook(book);
+        } else {
+            throw new Exception("无法归还该书");
+        }
+    }
+
+    public List<Book> getBorrowedBooks(String username) {
+        User user = getUserByName(username);
+        if (user instanceof NormalUser) {
+            return ((NormalUser) user).getBorrowedBooks();
+        }
+        return new ArrayList<>();
+    }
+
+    public String getUsernameFromToken(String token) {
+    try {
+        Claims claims = Jwts.parserBuilder()
+            .setSigningKey(getSigningKey())
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+        return claims.getSubject();
+    } catch (Exception e) {
+        System.err.println("Could not get username from token: " + e.getMessage());
+        return null;
+    }
+}
+
+    public List<Map<String, Object>> getAllBooksWithStatus() {
+        List<Book> allBooks = bookRepository.findAll();
+        List<Map<String, Object>> booksWithStatus = new ArrayList<>();
+
+        for (Book book : allBooks) {
+            Map<String, Object> bookInfo = new HashMap<>();
+            bookInfo.put("id", book.getId());
+            bookInfo.put("title", book.getTitle());
+            bookInfo.put("author", book.getAuthor());
+            bookInfo.put("isbn", book.getISBN());
+            bookInfo.put("borrowed", book.isBorrowed());
+
+            if (book.isBorrowed()) {
+                String borrowerName = findBorrowerName(book);
+                bookInfo.put("borrowerName", borrowerName);
+            }
+
+            booksWithStatus.add(bookInfo);
+        }
+
+        return booksWithStatus;
+    }
+
+    private String findBorrowerName(Book book) {
+        List<NormalUser> normalUsers = userRepository.findAllNormalUsers();
+        for (NormalUser user : normalUsers) {
+            if (user.getBorrowedBooks().contains(book)) {
+                return user.getName();
+            }
+        }
+        return null;
     }
 }

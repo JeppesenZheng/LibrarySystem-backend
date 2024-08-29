@@ -11,6 +11,7 @@ public class Book {
     private String title;
     private String author;
     private String isbn;
+    private boolean borrowed;
 
     public Book() { }
 
@@ -18,6 +19,7 @@ public class Book {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
+        this.borrowed = false;
     }
 
     public String getTitle() {
@@ -42,6 +44,18 @@ public class Book {
 
     public void setISBN(String isbn) {
         this.isbn = isbn;
+    }
+
+    public boolean isBorrowed() {
+        return borrowed;
+    }
+
+    public void setBorrowed(boolean borrowed) {
+        this.borrowed = borrowed;
+    }
+
+    public Long getId() {
+        return id;
     }
 
 }

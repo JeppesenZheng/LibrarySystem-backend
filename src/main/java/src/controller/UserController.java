@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,15 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Value("${jwt.secret}")
+    private String secretString;
+
+    // unused
+    // private Key getSigningKey() {
+    //     byte[] keyBytes = java.util.Base64.getDecoder().decode(secretString);
+    //     return Keys.hmacShaKeyFor(keyBytes);
+    // }
 
     @PostMapping("/createSystemAdmin")
     public SystemAdmin createSystemAdmin(@RequestBody User user) {
@@ -59,20 +69,21 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    // example of testing in Client API
     public ResponseEntity<?> login(@RequestParam String name, @RequestParam String password) {
         try {
             String token = userService.authenticate(name, password);
             if (token != null) {
                 User user = userService.getUserByName(name);
-                Map<String, String> response = new HashMap<String, String>();
+                Map<String, String> response = new HashMap<>();
                 response.put("token", token);
                 response.put("userType", getUserType(user));
+                System.out.println("Generated token: " + token);
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("认证失败");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("登录时发生错误：" + e.getMessage());
         }
     }
