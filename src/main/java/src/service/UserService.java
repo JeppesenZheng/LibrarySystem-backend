@@ -70,20 +70,6 @@ public class UserService {
 
     @Transactional
     public NormalUser createNormalUser(String name, String password) {
-        // checkUserExists(name, password);
-        // try {
-        //     if (userRepository.findByName(name).isPresent()) {
-        //         throw new IllegalArgumentException("User with the same name already exists.");
-        //     }
-        //     NormalUser normalUser = new NormalUser(name, password);
-        //     NormalUser savedUser = userRepository.save(normalUser);
-        //     System.out.println("User created successfully: " + savedUser.getName());
-        //     return savedUser;
-        // } catch (Exception e) {
-        //     System.err.println("Error creating user: " + e.getMessage());
-        //     e.printStackTrace();
-        //     throw e;
-        // }
         if (userRepository.findByName(name).isPresent()) {
             throw new IllegalArgumentException("User with the same name already exists.");
         }
@@ -263,5 +249,30 @@ public class UserService {
         if (user instanceof BookAdmin) return "bookAdmin";
         if (user instanceof SystemAdmin) return "systemAdmin";
         return "unknown";
+    }
+
+    @Transactional
+    public User updateUserType(Long userId, String newUserType) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User updatedUser;
+        switch (newUserType) {
+            case "normal":
+                updatedUser = new NormalUser(user.getName(), user.getPassword());
+                break;
+            case "bookAdmin":
+                updatedUser = new BookAdmin(user.getName(), user.getPassword());
+                break;
+            case "systemAdmin":
+                updatedUser = new SystemAdmin(user.getName(), user.getPassword());
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid user type");
+        }
+        updatedUser.setId(userId);
+        return userRepository.save(updatedUser);
+    }
+
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 }
