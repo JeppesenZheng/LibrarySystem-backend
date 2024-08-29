@@ -1,5 +1,8 @@
 package src.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +25,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    // @PostMapping("/create")
-    // public User createUser(@RequestBody User user) {
-    //     System.out.println("try to create User class");
-    //     try {
-    //         return userService.createUser(user.getName(), user.getPassword());
-    //     } catch (IllegalArgumentException e) {
-    //         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-    //     }
-    // }
 
     @PostMapping("/createSystemAdmin")
     public SystemAdmin createSystemAdmin(@RequestBody User user) {
@@ -66,14 +59,29 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    // example of testing in Client API 
-    // http://localhost:8080/users/login?name=user1&password=1111
-    public String login(@RequestParam String name, @RequestParam String password) {
-        String token = userService.authenticate(name, password);
-        if (token != null) {
-            return token;
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication failed");
+    // example of testing in Client API
+    public ResponseEntity<?> login(@RequestParam String name, @RequestParam String password) {
+        try {
+            String token = userService.authenticate(name, password);
+            if (token != null) {
+                User user = userService.getUserByName(name);
+                Map<String, String> response = new HashMap<String, String>();
+                response.put("token", token);
+                response.put("userType", getUserType(user));
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("认证失败");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("登录时发生错误：" + e.getMessage());
         }
     }
+
+    private String getUserType(User user) {
+        if (user instanceof NormalUser) return "normal";
+        if (user instanceof BookAdmin) return "bookAdmin";
+        if (user instanceof SystemAdmin) return "systemAdmin";
+        return "unknown";
+    }
+
 }
