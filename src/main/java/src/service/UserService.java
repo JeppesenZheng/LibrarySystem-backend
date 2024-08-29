@@ -160,12 +160,23 @@ public class UserService {
     public void returnBook(String username, String isbn) throws Exception {
         User user = getUserByName(username);
         Book book = getBookByISBN(isbn);
+        System.out.println("尝试归还图书: 用户=" + username + ", ISBN=" + isbn);
         if (user instanceof NormalUser && book != null && book.isBorrowed()) {
             ((NormalUser) user).returnBook(book);
             book.setBorrowed(false);
+            if (book.getBorrowCount() == null) {
+                book.setBorrowCount(1);  // 如果为null，设置为1
+            } else {
+                book.setBorrowCount(book.getBorrowCount() + 1);  // 增加借阅次数
+            }
             updateBook(book);
+            System.out.println("图书归还成功");
         } else {
-            throw new Exception("无法归还该书");
+            String errorMsg = "无法归还该书: 用户类型=" + user.getClass().getSimpleName() + 
+                              ", 图书存在=" + (book != null) + 
+                              ", 图书已借出=" + (book != null && book.isBorrowed());
+            System.err.println(errorMsg);
+            throw new Exception(errorMsg);
         }
     }
 

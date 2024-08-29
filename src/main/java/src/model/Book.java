@@ -17,9 +17,11 @@ public class Book {
     private LocalDate borrowDate;
     private int borrowDays;
     @Column(nullable = false)
-    private Integer borrowCount = 0;
+    private Integer borrowCount = 0;  // 初始化为0
 
-    public Book() { }
+    public Book() {
+        this.borrowCount = 0;  // 在默认构造函数中初始化
+    }
 
     public Book(String title, String author, String isbn) {
         this.title = title;
