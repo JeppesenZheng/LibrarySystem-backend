@@ -150,6 +150,7 @@ public class UserService {
             book.setBorrowed(true);
             book.setBorrowDate(LocalDate.now());
             book.setBorrowDays(days);
+            book.incrementBorrowCount();
             updateBook(book);
         } else {
             throw new Exception("无法借阅该书");

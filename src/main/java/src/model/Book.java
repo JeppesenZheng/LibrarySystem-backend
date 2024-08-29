@@ -16,6 +16,8 @@ public class Book {
     private boolean borrowed;
     private LocalDate borrowDate;
     private int borrowDays;
+    @Column(nullable = false)
+    private Integer borrowCount = 0;
 
     public Book() { }
 
@@ -78,5 +80,15 @@ public class Book {
         this.borrowDays = borrowDays;
     }
 
+    public Integer getBorrowCount() {
+        return borrowCount == null ? 0 : borrowCount;
+    }
 
+    public void setBorrowCount(Integer borrowCount) {
+        this.borrowCount = borrowCount == null ? 0 : borrowCount;
+    }
+
+    public void incrementBorrowCount() {
+        this.borrowCount = (this.borrowCount == null ? 0 : this.borrowCount) + 1;
+    }
 }

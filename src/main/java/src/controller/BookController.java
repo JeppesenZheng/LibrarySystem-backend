@@ -1,12 +1,16 @@
 package src.controller;
 
+import src.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import src.User.BookAdmin;
+import src.User.SystemAdmin;
 import src.model.Book;
 import src.service.UserService;
+import src.service.BookService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +23,9 @@ public class BookController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private BookService bookService;
 
     @GetMapping
     public List<Book> getAllBooks() {
@@ -117,6 +124,27 @@ public class BookController {
             System.err.println("Error in getAllBooksWithStatus: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token 验证失败: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<?> getBookStatistics(@RequestHeader("Authorization") String token) {
+        try {
+            String username = userService.getUsernameFromToken(token.replace("Bearer ", ""));
+            if (username == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("无效的 token");
+            }
+            User user = userService.getUserByName(username);
+            if (!(user instanceof BookAdmin || user instanceof SystemAdmin)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("没有权限访问此资源");
+            }
+            Map<String, Object> statistics = bookService.getBookStatistics();
+            System.out.println("Statistics: " + statistics);
+            return ResponseEntity.ok(statistics);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("获取图书统计数据失败: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("获取图书统计数据失败: " + e.getMessage());
         }
     }
 }
